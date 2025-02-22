@@ -1,8 +1,8 @@
-# Students API
+📚 Students API
+A simple RESTful API to manage students using SQLite as the database. This project implements basic CRUD operations (Create, Read, Update, Delete) along with additional HTTP methods like HEAD to check if a student exists.
 
-A simple RESTful API to manage students using SQLite as the database. This project implements basic CRUD operations (Create, Read, Update, Delete) along with additional HTTP methods like `HEAD` to check if a student exists.
-# 📂 Project Structure
-pgsql
+📂 Project Structure
+bash
 Copy
 Edit
 students-api/
@@ -10,87 +10,78 @@ students-api/
 │   └── main.go       # Main entry point
 │── storage/
 │   ├── storage.go    # SQLite database connection
+│   ├── storage.db    # SQLite database (auto-created)
 │── handlers/
 │   ├── student.go    # Student API handlers
 │── models/
 │   ├── student.go    # Student struct
-│── storage/
-│   ├── storage.db    # SQLite database (auto-created)
 │── README.md         # Documentation
 │── go.mod            # Go module file
+✨ Features
+Create: Add a new student.
+Read: Retrieve student details by ID or list all students.
+Update: Modify an existing student's details.
+Delete: Remove a student from the database.
+Existence Check: Use the HEAD request to verify if a student exists without retrieving full data.
+⚙️ Prerequisites
+Before running the project, ensure you have:
 
-## Features
-
-- **Create**: Add a new student.
-- **Read**: Get a student's details by their ID, or list all students.
-- **Update**: Update an existing student's details.
-- **Delete**: Remove a student.
-- **Check if a student exists**: Use the `HEAD` request to verify if a student is available without retrieving the entire data.
-
-## Prerequisites
-
-- [Go](https://golang.org/doc/install) version 1.18+ must be installed on your machine.
-- SQLite3 for database management.
-- [Postman](https://www.postman.com/) or any HTTP client for testing the API.
-
-## Installation
-
-### Clone the Repository
-To get started, clone the repository to your local machine:
-```bash
+Go (version 1.18+).
+SQLite3 installed for database management.
+Postman or any HTTP client for API testing.
+🚀 Installation
+1️⃣ Clone the Repository
+bash
+Copy
+Edit
 git clone https://github.com/madihanazir/students-api.git
 cd students-api
-```
-## Install Dependencies
-The project depends on some external libraries which can be installed using go mod:
-
-```bash
+2️⃣ Install Dependencies
+bash
 Copy
 Edit
 go mod tidy
-```
-## SQLite Setup
-SQLite is used as the database, and the necessary tables will be created automatically when you run the application.
+3️⃣ SQLite Setup
+SQLite is used as the database, and the required tables will be created automatically when the application runs.
 
-If you want to inspect the database or perform manual queries, you can install SQLite by following the instructions here.
+If you want to inspect the database or perform manual queries, install SQLite by following the instructions here.
 
-## Configuration
-The project comes with a configuration file under internal/config. To use the default configuration, simply create a .env file and add the following variables (optional):
+⚙️ Configuration
+The project supports configuration via a .env file. Create one and add the following environment variables (optional):
 
-```bash
+bash
 Copy
 Edit
-```
 HTTP_SERVER_ADDR=":8080"
 STORAGE_PATH="storage/storage.db"
-## Running the Application
-To start the API server, run:
+▶️ Running the Application
+Start the API server with:
 
-```bash
+bash
 Copy
 Edit
-```
-go run main.go
-The API will be available at http://localhost:8080.
-## API Testing with Postman
-Postman allows you to test your API endpoints easily.
-
-## Installation:
--Download and install Postman.
--How to Use Postman for API Testing:
--Start the Server
--Make sure your server is running:
-
-sh:
 go run cmd/main.go
-The server should be listening at your localhost.
+The API will be available at: http://localhost:8080.
 
-## 🗄️ Database Setup & Visualization
--Option 1: Using TablePlus (Recommended)
--Download TablePlus for your OS.
--Open TablePlus and click "Create a new connection".
--Select "SQLite", then choose storage/storage.db.
--Click "Connect" to explore and manage the database visually.
+🛠️ API Testing with Postman
+✅ Install Postman
+Download and install Postman.
+✅ How to Use Postman for API Testing
+Start the server:
 
-Feel free to reach me at madihan541@gmail.com
+bash
+Copy
+Edit
+go run cmd/main.go
+Send API requests:
 
+Use Postman to make GET, POST, PUT, DELETE, and HEAD requests to test the API.
+🗄️ Database Setup & Visualization
+Option 1: Using TablePlus (Recommended)
+Download TablePlus for your OS.
+Open TablePlus and click "Create a new connection".
+Select "SQLite", then choose storage/storage.db.
+Click "Connect" to explore and manage the database visually.
+📬 Contact
+For any questions or suggestions, feel free to reach out:
+📧 madihan541@gmail.com
