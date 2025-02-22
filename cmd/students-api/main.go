@@ -11,7 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	//"github.com/gorilla/mux"
+	"github.com/gorilla/mux"
+	_ "github.com/gorilla/mux"
 	"github.com/madihanazir/students-api/internal/config"
 	"github.com/madihanazir/students-api/internal/http/handlers/student"
 	"github.com/madihanazir/students-api/storage/sqlite"
@@ -25,29 +26,27 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't connect to database: %v", err)
 	}
-	
+
 	slog.Info("storage initialized", slog.String("version", "1.0.0"))
 
 	//setup router
-	router := http.NewServeMux()
+	router := mux.NewRouter()
 
 	fmt.Println("Registered Routes:")
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte("Root route working!"))})
-
-
+		w.Write([]byte("Root route working!"))
+	}).Methods("GET")
 	fmt.Println("/ registered")
+
+	router.HandleFunc("/api/students", student.New(storage)).Methods("POST")
 	fmt.Println("/api/students registered")
 
-	router.HandleFunc("/api/students", student.New(storage))
-	fmt.Println("/api/students registered")
-
-	
+	router.HandleFunc("/api/students/{id:[0-9]+}", student.GetById(storage)).Methods("GET")
+	fmt.Println("/api/students/{id} registered")
 
 	router.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Test route working!")
-	})
-	
+	}).Methods("GET")
 
 	//router.HandleFunc("/api/students", student.New().ServeHTTP)
 	//http.HandleFunc("/api/students", student.New())
@@ -59,6 +58,7 @@ func main() {
 	}
 	slog.Info("starting server...", slog.String("address", cfg.HTTPServer.Addr))
 
+	//graceful shutdown
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
@@ -78,5 +78,5 @@ func main() {
 		slog.Error("can't shutdown server", slog.String("error", err.Error()))
 	}
 	slog.Info("server stopped")
-	
+
 }
