@@ -11,10 +11,12 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/madihanazir/students-api/internal/types"
 	"github.com/madihanazir/students-api/internal/utils/response"
+	"github.com/madihanazir/students-api/storage"
 )
 
 // New returns an HTTP handler function for the students API
-func New() http.HandlerFunc {
+// here we use dependency injection to pass the storage interface
+func New(storage storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("creating new student")
 		var student types.Student
@@ -28,6 +30,8 @@ func New() http.HandlerFunc {
 			response.WriteJSON(w, http.StatusBadRequest, response.GeneralError(err))
 			return
 		}
+		//request validation
+
 		validate := validator.New()
 		if err := validate.Struct(student); err != nil {
 			validateErrs, ok := err.(validator.ValidationErrors)
@@ -40,11 +44,16 @@ func New() http.HandlerFunc {
 			return
 		}
 
-		response.WriteJSON(w, http.StatusCreated, map[string]string{"success": "OK"})
-		//request validation
+		lastId, err := storage.CreateStudent(student.Name, student.Email, student.Age)
+		slog.Info("user created", slog.String("userId", fmt.Sprint(lastId)))
+		if err != nil {
+			response.WriteJSON(w, http.StatusInternalServerError, response.GeneralError(err))
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Students API is working"))
+			return
+		}
+
+		slog.Info("user created", slog.String("userId", fmt.Sprint(lastId)))
+
+		response.WriteJSON(w, http.StatusCreated, map[string]int64{"id": lastId})
 	}
 }

@@ -14,11 +14,20 @@ import (
 	//"github.com/gorilla/mux"
 	"github.com/madihanazir/students-api/internal/config"
 	"github.com/madihanazir/students-api/internal/http/handlers/student"
+	"github.com/madihanazir/students-api/storage/sqlite"
 )
 
 func main() {
 	//loag config & database setup
 	cfg := config.Mustload()
+
+	storage, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatalf("can't connect to database: %v", err)
+	}
+	
+	slog.Info("storage initialized", slog.String("version", "1.0.0"))
+
 	//setup router
 	router := http.NewServeMux()
 
@@ -30,7 +39,7 @@ func main() {
 	fmt.Println("/ registered")
 	fmt.Println("/api/students registered")
 
-	router.HandleFunc("/api/students", student.New())
+	router.HandleFunc("/api/students", student.New(storage))
 	fmt.Println("/api/students registered")
 
 	
@@ -64,7 +73,7 @@ func main() {
 	slog.Info("shutting down server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := server.Shutdown(ctx)
+	err = server.Shutdown(ctx)
 	if err != nil {
 		slog.Error("can't shutdown server", slog.String("error", err.Error()))
 	}
