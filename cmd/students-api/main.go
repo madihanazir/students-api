@@ -44,6 +44,14 @@ func main() {
 	router.HandleFunc("/api/students/{id:[0-9]+}", student.GetById(storage)).Methods("GET")
 	fmt.Println("/api/students/{id} registered")
 
+	router.HandleFunc("/api/students", student.GetList(storage)).Methods("GET")
+	router.HandleFunc("/api/students/{id:[0-9]+}", student.UpdateStudent(storage)).Methods("PUT")
+	router.HandleFunc("/api/students/{id:[0-9]+}", student.PatchStudent(storage)).Methods("PATCH")
+	router.HandleFunc("/api/students/{id:[0-9]+}", student.DeleteStudent(storage)).Methods("DELETE")
+	router.HandleFunc("/api/students/{id:[0-9]+}", student.StudentExists(storage)).Methods("HEAD")
+
+
+
 	router.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Test route working!")
 	}).Methods("GET")

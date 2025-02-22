@@ -113,3 +113,115 @@ func GetById(storage storage.Storage) http.HandlerFunc {
 		json.NewEncoder(w).Encode(student)
 	}
 }
+func GetList(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("getting list of students")
+		students, err := storage.GetStudents()
+		if err != nil {
+			response.WriteJSON(w, http.StatusInternalServerError, response.GeneralError(err))
+			return
+		}
+		response.WriteJSON(w, http.StatusOK, students)
+	}
+}
+
+func UpdateStudent(storage storage.Storage) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        vars := mux.Vars(r)
+        id, err := strconv.ParseInt(vars["id"], 10, 64)
+        if err != nil {
+            response.WriteJSON(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("invalid id format")))
+            return
+        }
+
+        var student types.Student
+        err = json.NewDecoder(r.Body).Decode(&student)
+        if err != nil {
+            response.WriteJSON(w, http.StatusBadRequest, response.GeneralError(err))
+            return
+        }
+
+        err = storage.UpdateStudent(id, student.Name, student.Email, student.Age)
+        if err != nil {
+            response.WriteJSON(w, http.StatusInternalServerError, response.GeneralError(err))
+            return
+        }
+
+        response.WriteJSON(w, http.StatusOK, map[string]string{"message": "student updated successfully"})
+    }
+}
+
+func PatchStudent(storage storage.Storage) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        vars := mux.Vars(r)
+        id, err := strconv.ParseInt(vars["id"], 10, 64)
+        if err != nil {
+            response.WriteJSON(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("invalid id format")))
+            return
+        }
+
+        var fields map[string]interface{}
+        err = json.NewDecoder(r.Body).Decode(&fields)
+        if err != nil {
+            response.WriteJSON(w, http.StatusBadRequest, response.GeneralError(err))
+            return
+        }
+
+        err = storage.PatchStudent(id, fields)
+        if err != nil {
+            response.WriteJSON(w, http.StatusInternalServerError, response.GeneralError(err))
+            return
+        }
+
+        response.WriteJSON(w, http.StatusOK, map[string]string{"message": "student updated successfully"})
+    }
+}
+
+
+func DeleteStudent(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		idStr, ok := vars["id"]
+		if !ok || idStr == "" {
+			http.Error(w, `{"error": "missing id"}`, http.StatusBadRequest)
+			return
+		}
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, `{"error": "invalid id format"}`, http.StatusBadRequest)
+			return
+		}
+
+		err = storage.DeleteStudent(id)
+		if err != nil {
+			http.Error(w, `{"error": "`+err.Error()+`"}`, http.StatusInternalServerError)
+			return
+		}
+		response.WriteJSON(w, http.StatusOK, map[string]string{"message": "Student deleted successfully"})
+	}
+}
+
+func StudentExists(storage storage.Storage) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        vars := mux.Vars(r)
+        id, err := strconv.ParseInt(vars["id"], 10, 64)
+        if err != nil {
+            response.WriteJSON(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("invalid id format")))
+            return
+        }
+
+        exists, err := storage.StudentExists(id)
+        if err != nil {
+            response.WriteJSON(w, http.StatusInternalServerError, response.GeneralError(err))
+            return
+        }
+
+        if exists {
+            w.WriteHeader(http.StatusOK) // 200 OK if student exists
+        } else {
+            w.WriteHeader(http.StatusNotFound) // 404 Not Found if student doesn't exist
+        }
+    }
+}
+
+
